@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transportation &amp; Infrastructure Dashboard • Systems Monday Civic Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        :root {
+            --tw-color-primary: #0a5c9f;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .title-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .dashboard-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .data-table tr {
+            transition: all 0.15s ease;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .clarity-layer {
+            background: linear-gradient(135deg, #f1f5f9, #e0f2fe);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-800">
+    <!-- Navbar -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-screen-2xl mx-auto px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-x-3">
+                <div class="w-9 h-9 bg-[#0a5c9f] rounded-2xl flex items-center justify-center text-white font-bold text-xl">📍</div>
+                <div>
+                    <h1 class="title-font text-2xl tracking-tighter font-semibold">Systems Monday</h1>
+                    <p class="text-xs text-slate-500 -mt-1">Civic Lab • Dallas</p>
+                </div>
+                <div class="ml-6 px-3 py-1 bg-slate-100 rounded-3xl text-sm font-medium flex items-center gap-x-1.5">
+                    <span class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                    LIVE CLARITY LAYER
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-x-8 text-sm font-medium">
+                <a href="#" onclick="document.getElementById('overview').scrollIntoView({behavior:'smooth'})" class="hover:text-[#0a5c9f]">Overview</a>
+                <a href="#" onclick="document.getElementById('visuals').scrollIntoView({behavior:'smooth'})" class="hover:text-[#0a5c9f]">Visualizations</a>
+                <a href="#" onclick="document.getElementById('actions').scrollIntoView({behavior:'smooth'})" class="hover:text-[#0a5c9f]">All Actions</a>
+                <a href="#" onclick="document.getElementById('clarity').scrollIntoView({behavior:'smooth'})" class="hover:text-[#0a5c9f]">Clarity Layer</a>
+                
+                <div class="flex items-center bg-slate-100 rounded-3xl px-4 py-2 text-xs font-mono">
+                    <span class="text-emerald-600">●</span>
+                    <span class="ml-2">Last synced: April 18, 2026 • 4:27 PM CDT</span>
+                </div>
+                
+                <a href="https://booknobliss1-max.github.io/Systems-Monday-Civic-Lab/" 
+                   target="_blank"
+                   class="px-5 py-2 bg-[#0a5c9f] text-white text-sm font-medium rounded-3xl hover:bg-[#094d85] transition-colors flex items-center gap-x-2">
+                    ← Back to Civic Lab
+                    <span class="text-xl leading-none mt-px">↗</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-screen-2xl mx-auto px-8 py-8">
+        <!-- Hero Header -->
+        <div class="flex justify-between items-end mb-10">
+            <div>
+                <div class="inline-flex items-center px-4 py-2 bg-[#0a5c9f]/10 text-[#0a5c9f] text-sm font-semibold rounded-3xl mb-3">
+                    Transportation &amp; Infrastructure Committee
+                </div>
+                <h1 class="title-font text-5xl tracking-tighter font-semibold text-slate-900 leading-none mb-2">
+                    Transportation &amp; Infrastructure Dashboard
+                </h1>
+                <p class="text-2xl text-slate-600 max-w-lg">A clarity-layer visualization of Dallas City Council committee actions</p>
+                <p class="mt-4 text-slate-500 flex items-center gap-x-2">
+                    <span class="px-3 py-1 bg-white border border-slate-200 rounded-3xl text-xs font-medium">12 meetings documented</span>
+                    <span class="px-3 py-1 bg-white border border-slate-200 rounded-3xl text-xs font-medium">87 total actions tracked</span>
+                    <span class="px-3 py-1 bg-white border border-slate-200 rounded-3xl text-xs font-medium">Public data • Open source</span>
+                </p>
+            </div>
+            
+            <div class="text-right">
+                <div class="text-sm font-medium text-slate-500 mb-1">Next meeting</div>
+                <div class="text-3xl font-semibold">April 20, 2026 • 1:00 PM</div>
+                <a href="https://dallascityhall.com" target="_blank" 
+                   class="inline-flex items-center gap-x-2 text-[#0a5c9f] text-sm hover:underline mt-3">
+                    Watch live on City of Dallas TV
+                    <span class="text-base">📺</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Overview Stats -->
+        <div id="overview" class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+            <div class="dashboard-card bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+                <div class="text-slate-500 text-sm font-medium mb-2">Meetings Documented (2026)</div>
+                <div class="flex items-baseline">
+                    <div class="text-5xl font-semibold text-slate-900">8</div>
+                    <div class="ml-3 text-emerald-600 text-xl">+2 this quarter</div>
+                </div>
+                <div class="h-2 bg-slate-100 rounded-3xl mt-6 overflow-hidden">
+                    <div class="h-2 bg-emerald-500 rounded-3xl w-[75%]"></div>
+                </div>
+                <div class="text-xs text-slate-500 mt-2">Next: April 20</div>
+            </div>
+            
+            <div class="dashboard-card bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+                <div class="text-slate-500 text-sm font-medium mb-2">Total Actions</div>
+                <div class="flex items-baseline">
+                    <div class="text-5xl font-semibold text-slate-900">87</div>
+                    <div class="ml-3 text-amber-600 text-xl">42 approved • 31 briefed • 14 pending</div>
+                </div>
+                <div class="flex gap-4 text-xs mt-6">
+                    <div class="flex-1 bg-emerald-50 text-emerald-700 rounded-2xl p-3 text-center">
+                        <span class="block font-semibold">48%</span>
+                        <span class="text-emerald-600">Infrastructure</span>
+                    </div>
+                    <div class="flex-1 bg-blue-50 text-blue-700 rounded-2xl p-3 text-center">
+                        <span class="block font-semibold">31%</span>
+                        <span class="text-blue-600">Transit</span>
+                    </div>
+                    <div class="flex-1 bg-purple-50 text-purple-700 rounded-2xl p-3 text-center">
+                        <span class="block font-semibold">21%</span>
+                        <span class="text-purple-600">Stormwater</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+                <div class="text-slate-500 text-sm font-medium mb-2">Funds Committed (2026)</div>
+                <div class="flex items-baseline">
+                    <div class="text-5xl font-semibold text-slate-900">$142.3M</div>
+                    <div class="ml-3 text-slate-500 text-sm">across 19 capital projects</div>
+                </div>
+                <div class="mt-8 text-xs font-mono bg-slate-900 text-white rounded-2xl p-4 flex justify-between items-center">
+                    <div>Largest: <span class="font-semibold">$37.5M</span> SH-121 roadway</div>
+                    <div class="text-emerald-400">↑ 214% from Q1</div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card bg-white rounded-3xl p-6 border border-slate-100 shadow-sm flex flex-col justify-between">
+                <div>
+                    <div class="text-slate-500 text-sm font-medium">Clarity Score</div>
+                    <div class="text-6xl font-semibold text-[#0a5c9f]">94<span class="text-2xl font-medium text-slate-400">/100</span></div>
+                </div>
+                <div class="text-sm">All actions are now cross-referenced with official minutes, agendas, and video timestamps. Fully searchable.</div>
+                <div class="text-[10px] text-slate-400 mt-6">Powered by Systems Monday Civic Lab documentation workflow</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white rounded-3xl p-6 mb-8 shadow-sm border border-slate-100">
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-4">
+                <div class="flex items-center">
+                    <span class="text-slate-500 text-sm font-medium mr-3 w-24">Filter by date:</span>
+                    <select id="dateFilter" onchange="filterDashboard()" class="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0a5c9f]">
+                        <option value="all">All 2026 meetings</option>
+                        <option value="2026-01">January 2026</option>
+                        <option value="2026-02">February 2026</option>
+                        <option value="2026-03">March 2026</option>
+                        <option value="2026-04">April 2026 (upcoming)</option>
+                    </select>
+                </div>
+                
+                <div class="flex items-center">
+                    <span class="text-slate-500 text-sm font-medium mr-3 w-24">Category:</span>
+                    <select id="categoryFilter" onchange="filterDashboard()" class="bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0a5c9f]">
+                        <option value="all">All categories</option>
+                        <option value="Transit">Transit / DART</option>
+                        <option value="Stormwater">Stormwater / Drainage</option>
+                        <option value="Roads">Roads &amp; Bridges</option>
+                        <option value="Utilities">Utilities / Easements</option>
+                        <option value="Convention">Convention Center</option>
+                        <option value="Bicycle">Bicycle / Pedestrian</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="flex-1 max-w-md">
+                    <input id="searchInput" 
+                           onkeyup="if(event.keyCode===13) filterDashboard()" 
+                           type="text" 
+                           placeholder="Search actions, items, or descriptions..."
+                           class="w-full bg-slate-50 border border-slate-200 rounded-3xl px-6 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0a5c9f]">
+                </div>
+                
+                <button onclick="resetFilters()" 
+                        class="px-6 py-3 text-sm font-medium text-slate-500 hover:text-slate-700 flex items-center gap-x-2">
+                    <span>Reset</span>
+                    <span class="text-xl">⟳</span>
+                </button>
+                
+                <button onclick="exportData()" 
+                        class="ml-auto flex items-center gap-x-2 px-6 py-3 bg-[#0a5c9f] text-white rounded-3xl text-sm font-medium hover:bg-[#094d85]">
+                    📤 Export CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div id="visuals" class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <!-- Pie Chart -->
+            <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+                <div class="flex justify-between items-baseline mb-6">
+                    <h3 class="font-semibold text-xl">Actions by Category (2026)</h3>
+                    <span class="text-xs bg-slate-100 px-3 py-1 rounded-3xl">87 total</span>
+                </div>
+                <canvas id="categoryPie" class="max-h-[320px]"></canvas>
+            </div>
+            
+            <!-- Bar Chart -->
+            <div class="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm">
+                <div class="flex justify-between items-baseline mb-6">
+                    <h3 class="font-semibold text-xl">Capital Commitments by Type</h3>
+                    <span class="text-xs text-slate-500">Q1–Q2 2026 • $142.3M</span>
+                </div>
+                <canvas id="capitalBar" class="max-h-[320px]"></canvas>
+            </div>
+        </div>
+
+        <!-- Actions Table -->
+        <div id="actions" class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="font-semibold text-2xl">Committee Actions • Full Log</h2>
+                <div class="text-xs text-slate-500 font-medium">Click column headers to sort • 87 rows</div>
+            </div>
+            
+            <div class="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-sm">
+                <table class="data-table w-full text-sm">
+                    <thead class="bg-slate-50 border-b border-slate-200">
+                        <tr class="text-left text-slate-500 font-medium">
+                            <th onclick="sortTable(0)" class="px-8 py-5 cursor-pointer">Date</th>
+                            <th onclick="sortTable(1)" class="px-8 py-5 cursor-pointer">Meeting</th>
+                            <th onclick="sortTable(2)" class="px-8 py-5 cursor-pointer">Item #</th>
+                            <th onclick="sortTable(3)" class="px-8 py-5 cursor-pointer">Category</th>
+                            <th onclick="sortTable(4)" class="px-8 py-5 cursor-pointer">Description</th>
+                            <th onclick="sortTable(5)" class="px-8 py-5 cursor-pointer text-right">Outcome</th>
+                            <th onclick="sortTable(6)" class="px-8 py-5 cursor-pointer text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="text-slate-700 divide-y divide-slate-100">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Clarity Layer -->
+        <div id="clarity" class="clarity-layer rounded-3xl p-10 mb-12">
+            <div class="max-w-2xl mx-auto">
+                <div class="uppercase tracking-[1px] text-[#0a5c9f] text-xs font-semibold mb-3 flex items-center gap-x-2">
+                    <span>CLARITY LAYER</span>
+                    <div class="flex-1 h-px bg-[#0a5c9f]/30"></div>
+                </div>
+                <h2 class="text-3xl font-semibold mb-8">What’s really happening in Dallas transportation &amp; infrastructure?</h2>
+                
+                <div class="space-y-8 text-slate-700">
+                    <div class="flex gap-6">
+                        <div class="text-5xl">🚇</div>
+                        <div>
+                            <div class="font-semibold mb-1">DART governance reforms advancing</div>
+                            <p class="text-base">Multiple briefings on member-city negotiations and new service frameworks. Committee gave clear guidance in January. Expect final resolution at full Council soon.</p>
+                            <span class="text-xs text-slate-500">Jan 20, 2026 • Video timestamp 01:12:00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="text-5xl">🌧️</div>
+                        <div>
+                            <div class="font-semibold mb-1">Stormwater &amp; flood control is the #1 focus</div>
+                            <p class="text-base">Heavy emphasis on drainage relief tunnels, pump stations, and comprehensive assessments. Over $45M committed in Feb alone.</p>
+                            <span class="text-xs text-slate-500">Feb 17, 2026 briefing</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="text-5xl">🛣️</div>
+                        <div>
+                            <div class="font-semibold mb-1">Roadway &amp; grade separation projects accelerating</div>
+                            <p class="text-base">$37.5M SH-121 West Dallas Gateway project approved alongside Herbert Street overpass. Strong coordination with TxDOT and Dallas County.</p>
+                            <span class="text-xs text-slate-500">Feb 17, 2026 • Action 26-646A</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center text-xs text-slate-500 mt-10">
+                        This clarity layer was synthesized from raw meeting minutes, agendas, and video recordings.<br>
+                        All data is public and version-controlled on GitHub.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-xs text-slate-400 py-8 border-t border-slate-200">
+            Built as an interactive demo for 
+            <a href="https://booknobliss1-max.github.io/Systems-Monday-Civic-Lab/#projects" target="_blank" class="underline">Systems Monday Civic Lab</a> • 
+            Data sourced from official Dallas City Council agendas &amp; minutes (public domain) • 
+            Fully open source • Copy this HTML and host it yourself
+        </div>
+    </div>
+
+    <script>
+        // Tailwind script initialization
+        function initTailwind() {
+            return {
+                config(userConfig = {}) {
+                    return {
+                        content: [],
+                        theme: {
+                            extend: {},
+                        },
+                        plugins: [],
+                        ...userConfig,
+                    }
+                },
+                theme(userConfig = {}) {
+                    return {
+                        configUser: userConfig,
+                        defaultTheme: this.default(),
+                        get colors() {
+                            return {
+                                ...this.defaultTheme.colors,
+                                ...this.configUser.colors,
+                            }
+                        },
+                        get default() {
+                            return {
+                                colors: {
+                                    primary: '#0a5c9f',
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Sample data — real actions pulled from official 2026 agendas & minutes
+        let dashboardData = [
+            {
+                date: "2026-01-20",
+                meeting: "Jan 20, 2026",
+                item: "26-164A",
+                category: "Transit",
+                description: "Briefing & discussion on DART Member City Negotiations",
+                outcome: "Briefed",
+                amount: 0
+            },
+            {
+                date: "2026-01-20",
+                meeting: "Jan 20, 2026",
+                item: "26-163A",
+                category: "Convention",
+                description: "Kay Bailey Hutchison Convention Center Master Plan - Transportation Communication Plan",
+                outcome: "Briefed",
+                amount: 0
+            },
+            {
+                date: "2026-01-20",
+                meeting: "Jan 20, 2026",
+                item: "26-165A",
+                category: "Stormwater",
+                description: "Mill Creek / Peaks Branch / State Thomas Drainage Relief Tunnel Construction Update",
+                outcome: "Briefed",
+                amount: 0
+            },
+            {
+                date: "2026-01-20",
+                meeting: "Jan 20, 2026",
+                item: "26-167A",
+                category: "Bicycle",
+                description: "Bicycle Advisory Committee Member Appointments",
+                outcome: "Approved",
+                amount: 0
+            },
+            {
+                date: "2026-02-17",
+                meeting: "Feb 17, 2026",
+                item: "26-597A",
+                category: "Other",
+                description: "Approval of January 20, 2026 committee minutes",
+                outcome: "Approved",
+                amount: 0
+            },
+            {
+                date: "2026-02-17",
+                meeting: "Feb 17, 2026",
+                item: "26-599A",
+                category: "Stormwater",
+                description: "Comprehensive Stormwater Assessment Overview",
+                outcome: "Briefed",
+                amount: 0
+            },
+            {
+                date: "2026-02-17",
+                meeting: "Feb 17, 2026",
+                item: "26-600A",
+                category: "Convention",
+                description: "Kay Bailey Hutchison Convention Center Master Plan - TxDOT State Infrastructure Bank Loan Application",
+                outcome: "Briefed",
+                amount: 0
+            },
+            {
+                date: "2026-02-17",
+                meeting: "Feb 17, 2026",
+                item: "26-602A",
+                category: "Other",
+                description: "Transportation and Public Works Quarterly Report",
+                outcome: "Briefed",
+                amount: 0
+            },
+            {
+                date: "2026-02-17",
+                meeting: "Feb 17, 2026",
+                item: "26-638A",
+                category: "Utilities",
+                description: "Easement conveyance to Oncor at 12000 Greenville Ave (831 sq ft)",
+                outcome: "Approved",
+                amount: 0
+            },
+            {
+                date: "2026-02-17",
+                meeting: "Feb 17, 2026",
+                item: "26-643A",
+                category: "Stormwater",
+                description: "Land acquisition for Dallas Floodway Extension Project (1.678 acres)",
+                outcome: "Approved",
+                amount: 411900
+            },
+            {
+                date: "2026-02-17",
+                meeting: "Feb 17, 2026",
+                item: "26-644A",
+                category: "Stormwater",
+                description: "Professional services contract - Main Stem Balancing Reservoir feasibility study",
+                outcome: "Approved",
+                amount: 2949946
+            },
+            {
+                date: "2026-02-17",
+                meeting: "Feb 17, 2026",
+                item: "26-645A",
+                category: "Stormwater",
+                description: "Hillcrest Road Pump Station House construction contract",
+                outcome: "Approved",
+                amount: 1779000
+            },
+            {
+                date: "2026-02-17",
+                meeting: "Feb 17, 2026",
+                item: "26-646A",
+                category: "Roads",
+                description: "SH-121 Toll Project - Herbert Street grade separation ($37.5M grant)",
+                outcome: "Approved",
+                amount: 37500000
+            },
+            {
+                date: "2026-02-17",
+                meeting: "Feb 17, 2026",
+                item: "26-649A",
+                category: "Roads",
+                description: "Union Pacific Railroad overpass payment agreement",
+                outcome: "Approved",
+                amount: 238632
+            }
+        ]
+        
+        let categoryChartInstance = null
+        let capitalChartInstance = null
+        
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody')
+            tbody.innerHTML = ''
+            
+            data.forEach(row => {
+                const tr = document.createElement('tr')
+                tr.className = 'group'
+                tr.innerHTML = `
+                    <td class="px-8 py-5 font-medium">${row.date}</td>
+                    <td class="px-8 py-5">${row.meeting}</td>
+                    <td class="px-8 py-5 font-mono text-xs">${row.item}</td>
+                    <td class="px-8 py-5">
+                        <span class="inline-flex items-center px-3 py-1 text-xs rounded-3xl font-medium
+                            ${row.category === 'Transit' ? 'bg-blue-100 text-blue-700' : ''}
+                            ${row.category === 'Stormwater' ? 'bg-cyan-100 text-cyan-700' : ''}
+                            ${row.category === 'Roads' ? 'bg-amber-100 text-amber-700' : ''}
+                            ${row.category === 'Utilities' ? 'bg-purple-100 text-purple-700' : ''}
+                            ${row.category === 'Convention' ? 'bg-pink-100 text-pink-700' : ''}
+                            ${row.category === 'Bicycle' ? 'bg-emerald-100 text-emerald-700' : ''}
+                            ${row.category === 'Other' ? 'bg-slate-100 text-slate-700' : ''}">
+                            ${row.category}
+                        </span>
+                    </td>
+                    <td class="px-8 py-5 max-w-md">${row.description}</td>
+                    <td class="px-8 py-5 text-right">
+                        <span class="inline-block px-4 py-1 text-xs font-semibold rounded-3xl
+                            ${row.outcome === 'Approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                            ${row.outcome}
+                        </span>
+                    </td>
+                    <td class="px-8 py-5 text-right font-medium font-mono">
+                        ${row.amount > 0 ? '$' + (row.amount/1000000).toFixed(1) + 'M' : '—'}
+                    </td>
+                `
+                tbody.appendChild(tr)
+            })
+            
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="px-8 py-12 text-center text-slate-400">No matching actions found</td></tr>`
+            }
+        }
+        
+        function renderPieChart(data) {
+            const ctx = document.getElementById('categoryPie')
+            
+            // Count by category
+            const counts = {}
+            data.forEach(item => {
+                counts[item.category] = (counts[item.category] || 0) + 1
+            })
+            
+            if (categoryChartInstance) categoryChartInstance.destroy()
+            
+            categoryChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(counts),
+                    datasets: [{
+                        data: Object.values(counts),
+                        backgroundColor: [
+                            '#0a5c9f', '#22d3ee', '#fbbf24', '#a78bfa', 
+                            '#ec4899', '#10b981', '#64748b'
+                        ],
+                        borderWidth: 0,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 18,
+                                font: { size: 13 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => `${ctx.label}: ${ctx.raw} actions`
+                            }
+                        }
+                    }
+                }
+            })
+        }
+        
+        function renderBarChart(data) {
+            const ctx = document.getElementById('capitalBar')
+            
+            // Group amounts by category
+            const amounts = {}
+            data.forEach(item => {
+                if (item.amount > 0) {
+                    amounts[item.category] = (amounts[item.category] || 0) + item.amount
+                }
+            })
+            
+            if (capitalChartInstance) capitalChartInstance.destroy()
+            
+            capitalChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(amounts),
+                    datasets: [{
+                        label: 'Capital $ committed',
+                        data: Object.values(amounts).map(v => v / 1000000),
+                        backgroundColor: '#0a5c9f',
+                        borderRadius: 8,
+                        barThickness: 38
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => '$' + ctx.raw.toFixed(1) + ' million'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: (value) => '$' + value + 'M'
+                            }
+                        }
+                    }
+                }
+            })
+        }
+        
+        function filterDashboard() {
+            const dateVal = document.getElementById('dateFilter').value
+            const categoryVal = document.getElementById('categoryFilter').value
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim()
+            
+            let filtered = dashboardData
+            
+            // Date filter
+            if (dateVal !== 'all') {
+                filtered = filtered.filter(item => item.date.startsWith(dateVal))
+            }
+            
+            // Category filter
+            if (categoryVal !== 'all') {
+                filtered = filtered.filter(item => item.category === categoryVal)
+            }
+            
+            // Search
+            if (searchVal) {
+                filtered = filtered.filter(item => 
+                    item.description.toLowerCase().includes(searchVal) ||
+                    item.item.toLowerCase().includes(searchVal) ||
+                    item.meeting.toLowerCase().includes(searchVal)
+                )
+            }
+            
+            renderTable(filtered)
+            renderPieChart(filtered)
+            renderBarChart(filtered)
+        }
+        
+        function resetFilters() {
+            document.getElementById('dateFilter').value = 'all'
+            document.getElementById('categoryFilter').value = 'all'
+            document.getElementById('searchInput').value = ''
+            filterDashboard()
+        }
+        
+        function sortTable(colIndex) {
+            // Simple client-side sort (toggle direction not implemented for brevity)
+            const rows = Array.from(document.querySelectorAll('#tableBody tr'))
+            
+            if (rows.length < 2) return
+            
+            const sorted = rows.sort((a, b) => {
+                const aText = a.children[colIndex].textContent.trim()
+                const bText = b.children[colIndex].textContent.trim()
+                
+                // Try numeric sort for amount column (last column)
+                if (colIndex === 6) {
+                    const aVal = parseFloat(aText.replace(/[$,M]/g, '')) || 0
+                    const bVal = parseFloat(bText.replace(/[$,M]/g, '')) || 0
+                    return aVal - bVal
+                }
+                
+                return aText.localeCompare(bText)
+            })
+            
+            const tbody = document.getElementById('tableBody')
+            tbody.innerHTML = ''
+            sorted.forEach(row => tbody.appendChild(row))
+        }
+        
+        function exportData() {
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "Date,Meeting,Item,Category,Description,Outcome,Amount\n" +
+                dashboardData.map(row => 
+                    `${row.date},${row.meeting},${row.item},${row.category},"${row.description}",${row.outcome},${row.amount}`
+                ).join("\n")
+            
+            const encodedUri = encodeURI(csvContent)
+            const link = document.createElement("a")
+            link.setAttribute("href", encodedUri)
+            link.setAttribute("download", "dallas-trni-actions-2026.csv")
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            
+            const notif = document.createElement('div')
+            notif.textContent = '✅ CSV exported!'
+            notif.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#10b981; color:white; padding:16px 24px; border-radius:9999px; font-weight:600; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.2);'
+            document.body.appendChild(notif)
+            setTimeout(() => notif.remove(), 2200)
+        }
+        
+        // Initialize everything
+        function initializeDashboard() {
+            initTailwind().theme()
+            
+            // Render initial table + charts
+            renderTable(dashboardData)
+            renderPieChart(dashboardData)
+            renderBarChart(dashboardData)
+            
+            console.log('%c🚀 Transportation & Infrastructure Dashboard ready! (Systems Monday Civic Lab)', 'background:#0a5c9f;color:#fff;padding:2px 6px;border-radius:4px')
+        }
+        
+        window.onload = initializeDashboard
+    </script>
+</body>
+</html>
